@@ -1,0 +1,20 @@
+import cv2
+import numpy as np
+import argparse
+
+#Input args
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-- contente-image",dest = "content_path")
+parser.add_argument("-- style-image",dest = "style_image")
+
+args = parser.parse_args()
+
+content_image = cv2.imread(args.content_image)
+style_image = cv2.imread(args.style_image)
+
+cv2.resize(content_image,(style_image.shape[0],style_image.shape[1]))
+
+result = cv2.addWeighted(content_image,0.5,style_image,0.5,0)
+
+cv2.imwrite("/result/1.jpg",result)
