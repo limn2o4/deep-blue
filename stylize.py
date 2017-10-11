@@ -47,4 +47,23 @@ def stylization(network,init,content,style,content_weigth,style_weight,layer_exp
             feature = np.reshape(feature,(-1,feature.shape[3]))
             gram = np.matmul(feature.T,feature)/feature.size
             style_feature[layer] = gram
+    init_noise_coeff = 1.0 - init
 
+    #make image
+    with tf.Graph().as_default():
+        noise  = np.random.normal(size=style_shape,scale=np.std(content)*0.1)
+        initial = tf.random_normal(style_shape)*0.256
+
+        image = tf.Variable(initial)
+        net = vgg.load_net(vgg_weight,image,"max")
+
+        #content loss
+        content_layer_weights = {}
+        content_layer_weights['relu4_2'] = content_weigth
+        content_layer_weights['relu5_2'] = 1.0 - content_weigth
+
+        conten_loss = 0
+        content_losses = []
+        for layer in CONTENT_LAYER:
+            content_losses.append(content_layer_weights[layer]*content_weigth*(2*tf.nn.l2_loss(net[layer]-content_feature[layer])/content_feature[layer].size))
+        conten_loss += reduce(tf.add,conten_loss)
