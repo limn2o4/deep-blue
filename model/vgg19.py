@@ -54,3 +54,5 @@ def load_net(weights,input_image,pooling_type):
 
 def preProcess(image,mean):
     return image - mean
+def unprocess(image,mean):
+    return image + mean
